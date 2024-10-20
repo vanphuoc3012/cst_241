@@ -8,15 +8,6 @@ def getDir(file_name):
     print(dir)
     return dir
 
-def extractData(txt, prefix):
-    data = []
-    for line in txt:
-        line_data = line.split()
-        #print(line_data)
-        if line_data[0] == prefix:
-            data.append([int(i) for i in line_data[1:]])
-    return data
-
 def saveToTxt(data, name):
     dir = getDir(name)
     with open(dir, 'w', encoding='utf8') as f:
@@ -25,20 +16,40 @@ def saveToTxt(data, name):
             f.write(line)
     return
 
-def extract_c_d_t():
-    dir_coords = getDir('coords_NYC.txt')
-    dir_distance = getDir('distance_NYC.txt')
-    dir_time = getDir('time_NYC.txt')
+def smartParse(str):
+    str = str.replace("\n","")
+    #print(str)
+    try:
+        i = int(str)
+        return i
+    except:
+        pass
+    try:
+        f = float(str)
+        return f
+    except:
+        pass
+    return str
 
-    txt_coords = open(dir_coords, encoding='utf8')
-    txt_distance = open(dir_distance, encoding='utf8')
-    txt_time = open(dir_time, encoding='utf8')
+def extractCSV(txt, filter = []):
+    data = []
+    for line in txt:
+        line_data = line.split(',')
+        for i in filter:
+            line_data.pop(i)
+        new_data = [smartParse(i) for i in line_data]
+        #print(new_data)
+        data.append(new_data)
+    return data[1:]
 
-    coords = extractData(txt_coords, 'v')
-    distance = extractData(txt_distance, 'a')
-    time = extractData(txt_time, 'a')
+def extractData():
+    dir_edges = getDir('train.csv')
+    data_edges = open(dir_edges, encoding='utf8')
+    data_edges = extractCSV(data_edges, [13, 10, 9, 5, 4, 3, 2, 1, 0]) # pop filter from last to 1st
 
-    #print(coords)
-    #print(distance)
-    #print(time)
-    return coords, distance, time
+    dir_nodes = getDir('nodes.csv')
+    data_nodes = open(dir_nodes, encoding='utf8')
+    data_nodes = extractCSV(data_nodes)
+    #print(data_nodes[0])
+    
+    return data_nodes, data_edges

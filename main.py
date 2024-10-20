@@ -1,49 +1,53 @@
-from extract import extract_c_d_t
+from extract import extractData
+import numpy as np
 
 def getDestList(paths, start, total_time = 0):
     destinations = []
     for i in range(len(paths)):
-        if (paths[i]['start'] == start):
-            destinations.append({
-                'dest': paths[i]['dest'], 
-                'travel_time': paths[i]['travel_time'], 
-                'total_time': total_time + paths[i]['travel_time'],
-                'stop': False 
-                })
+        if (paths[i][0] == start):
+            destinations.append([
+                paths[i][1],              # dest
+                paths[i][2],              # travel_time
+                total_time + paths[i][2], # total_time
+                False                     # stop
+                ])
 #    print(destinations)
     return destinations
 
 def bruteForce(paths, start, dest, total_time = 0, history = {}):
-#    print(history)
-#    print(start)
+    print(history)
+    print(start)
     if (start in history):
-#        print('looped')
+        print('looped')
         return []
     histories = []
     destinations = getDestList(paths, start, total_time)
-#    print(np.asarray(destinations))
+    print(np.asarray(destinations))
     for each_dest in destinations:
         new_hist = history.copy()
         new_hist.update({start: total_time})
+        print(new_hist)
         if (dest in new_hist):
-#            print('reached dest')
+            print('reached dest')
             return [new_hist]    
-        histories += bruteForce(paths, each_dest['dest'], dest, each_dest['total_time'], new_hist)
-        
+        histories += bruteForce(paths, each_dest[0], dest, each_dest[2], new_hist)
+       
     return histories
 
 paths_FloydWarshall_example = [
-    {'start': 1, 'dest': 2, 'travel_time': 1},
-    {'start': 1, 'dest': 4, 'travel_time': 4},
-    {'start': 2, 'dest': 1, 'travel_time': 2},
-    {'start': 2, 'dest': 3, 'travel_time': -2},
-    {'start': 3, 'dest': 1, 'travel_time': 3},
-    {'start': 4, 'dest': 1, 'travel_time': 4},
-    {'start': 4, 'dest': 2, 'travel_time': -5},
-    {'start': 4, 'dest': 3, 'travel_time': -1}
+    # start, dest, travel_time
+    [1, 2, 1],
+    [1, 4, 4],
+    [2, 1, 2],
+    [2, 3, -2],
+    [3, 1, 3],
+    [4, 1, 4],
+    [4, 2, -5],
+    [4, 3, -1]
 ]
 
 #print(*bruteForce(paths_FloydWarshall_example, 1, 3), sep='\n')
-print(*bruteForce(paths_FloydWarshall_example, 1, 3), sep='\n')
 
-coords, distance, time = extract_c_d_t()
+nodes, edges = extractData()
+#print(edges)
+print(*bruteForce(edges, 366428456, 366416066), sep='\n')

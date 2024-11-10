@@ -4,11 +4,17 @@ import math
 import numpy as np
 from extract import getDir
 
+<<<<<<< HEAD
+def loadMap():
+    # load map from file
+    G = ox.io.load_graphml(filepath=getDir('./fullgraph.osm'))
+=======
 ox.settings.use_cache = True
 
 def loadMap(map_name):
     # load map from file
     G = ox.io.load_graphml(filepath=getDir(map_name))
+>>>>>>> 93a87c9ffe7fe2f7c1f9e3626cb7f0c209d82702
     print('G: ', G)
     '''
     # impute edge (driving) speeds and calculate edge travel times

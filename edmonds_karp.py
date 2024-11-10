@@ -14,7 +14,18 @@ def find_maximum_flow_using_edmonds_karp(graph, source, sink):
         tuple: (flow_value, all_routes)
             - flow_value: The maximum flow from the source to the sink
             - all_routes: A list of routes, where each route is a list of nodes
+        tuple: (flow_value, all_routes)
+            - flow_value: The maximum flow from the source to the sink
+            - all_routes: A list of routes, where each route is a list of nodes
     """
+    
+    def bfs(residual_graph, source, sink, parent):
+        visited = {node: False for node in residual_graph}
+        queue = deque()
+        queue.append(source)
+        visited[source] = True
+        
+
     
     def bfs(residual_graph, source, sink, parent):
         visited = {node: False for node in residual_graph}
@@ -25,6 +36,10 @@ def find_maximum_flow_using_edmonds_karp(graph, source, sink):
 
         while queue:
             u = queue.popleft()
+            
+            for v, data in residual_graph[u].items():
+                capacity = data['capacity']
+                if not visited[v] and capacity > 0:
             
             for v, data in residual_graph[u].items():
                 capacity = data['capacity']
@@ -47,10 +62,43 @@ def find_maximum_flow_using_edmonds_karp(graph, source, sink):
         Returns:
             list: The path from source to sink
         """
+                    visited[v] = True
+                    parent[v] = u
+        
+        return visited[sink]
+    
+    def get_path(parent, source, sink):
+        """
+        Reconstructs the path from source to sink using parent dictionary.
+        
+        Args:
+            parent (dict): Dictionary containing the path information
+            source (int): Source node
+            sink (int): Sink node
+            
+        Returns:
+            list: The path from source to sink
+        """
         path = []
         current = sink
         while current != source:
+        while current != source:
             path.append(current)
+            current = parent[current]
+        path.append(source)
+        return list(reversed(path))
+
+    if not (graph.has_node(source) and graph.has_node(sink)):
+        return 0, []
+
+    residual_graph = {node: {} for node in graph.nodes()}
+    for u, v, data in graph.edges(data=True):
+        residual_graph[u][v] = {'capacity': data['capacity']}
+        if v not in residual_graph[u]:
+            residual_graph[u][v] = {'capacity': 0}
+        if u not in residual_graph[v]:
+            residual_graph[v][u] = {'capacity': 0}
+
             current = parent[current]
         path.append(source)
         return list(reversed(path))
